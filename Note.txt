@@ -1,0 +1,17 @@
+https://www.npmjs.com/package/@react-native-async-storage/async-storage
+
+npx expo install @react-native-async-storage/async-storage
+
+npm i @react-native-async-storage/async-storage
+
+npm install expo-app-loading
+
+npx expo start --clear
+
+npx expo install expo-image-picker
+
+npx expo install @react-navigation/native @react-navigation/native-stack react-native-screens react-native-safe-area-context
+
+
+Force Expo to launch in Expo Go mode - npx expo start --go --tunnel --clear
+

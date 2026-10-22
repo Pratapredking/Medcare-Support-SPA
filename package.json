@@ -1,0 +1,18 @@
+{
+  "name": "medicare-support-spa",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "lucide-react": "latest",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "vite": "latest"
+  }
+}
