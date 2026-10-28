@@ -1,0 +1,75 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "userProfiles": {
+      ".read": "auth != null && root.child('userProfiles').child(auth.uid).child('role').val() === 'admin'",
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('userProfiles').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && auth.uid === $uid && (!data.exists() || data.child('role').val() === newData.child('role').val())",
+        "role": {
+          ".validate": "newData.val() === 'doctor' || newData.val() === 'technician' || newData.val() === 'admin'"
+        },
+        "email": {
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+    "hospitals": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('userProfiles').child(auth.uid).child('role').val() === 'admin'",
+      "$hospitalId": {
+        ".validate": "newData.hasChildren(['name', 'specialization', 'address', 'active', 'createdAt', 'createdBy'])",
+        "name": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "specialization": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "address": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "city": { ".validate": "newData.isString()" },
+        "active": { ".validate": "newData.isBoolean()" },
+        "createdBy": { ".validate": "newData.isString() && newData.val().length > 0" }
+      }
+    },
+    "doctorHospitalMappings": {
+      ".read": "auth != null && root.child('userProfiles').child(auth.uid).child('role').val() === 'admin'",
+      "$doctorId": {
+        ".read": "auth != null && auth.uid === $doctorId",
+        ".write": "auth != null && root.child('userProfiles').child(auth.uid).child('role').val() === 'admin' && root.child('userProfiles').child($doctorId).child('role').val() === 'doctor'",
+        ".validate": "newData.hasChildren(['hospitalIds', 'primaryId', 'updatedAt', 'updatedBy'])"
+      }
+    },
+    "medicalEquipment": {
+      ".read": "auth != null && root.child('userProfiles').child(auth.uid).child('role').val() === 'admin'",
+      "$entryId": {
+        ".write": "auth != null && root.child('userProfiles').child(auth.uid).child('role').val() === 'admin' && ((!data.exists() && newData.child('createdBy').val() === auth.uid) || data.exists())",
+        ".validate": "newData.hasChildren(['hospitalId', 'hospitalName', 'location', 'plotNo', 'department', 'type', 'equipmentName', 'make', 'model', 'serialNo', 'doi', 'quantity', 'ppmDoneOn', 'ppmDueOn', 'status', 'createdBy', 'createdByRole', 'createdAt']) && root.child('hospitals').child(newData.child('hospitalId').val()).child('active').val() === true && root.child('hospitals').child(newData.child('hospitalId').val()).child('name').val() === newData.child('hospitalName').val()",
+        "hospitalId": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "hospitalName": { ".validate": "newData.isString() && newData.val().length > 0" },
+        "sNo": { ".validate": "newData.isNumber() && newData.val() >= 1" },
+        "quantity": { ".validate": "newData.isNumber() && newData.val() >= 1" },
+        "status": { ".validate": "newData.val() === 'Functional' || newData.val() === 'Under Maintenance' || newData.val() === 'Non-functional' || newData.val() === 'Decommissioned'" }
+      }
+    },
+    "medicalEquipmentCatalog": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('userProfiles').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["hospitalId"],
+      "$entryId": {
+        ".validate": "newData.hasChildren(['equipmentName', 'location', 'department', 'model', 'status'])",
+        "equipmentName": { ".validate": "newData.isString() && newData.val().length > 0" }
+      }
+    },
+    "faultReports": {
+      ".read": "auth != null",
+      "$reportId": {
+        ".write": "auth != null && ((!data.exists() && root.child('userProfiles').child(auth.uid).child('role').val() === 'doctor' && newData.child('reportedById').val() === auth.uid && newData.hasChildren(['hospitalId', 'hospitalName', 'equipmentId']) && root.child('medicalEquipmentCatalog').child(newData.child('equipmentId').val()).child('hospitalId').val() === newData.child('hospitalId').val() && root.child('hospitals').child(newData.child('hospitalId').val()).child('name').val() === newData.child('hospitalName').val()) || (data.exists() && root.child('userProfiles').child(auth.uid).child('role').val() === 'technician'))"
+      }
+    },
+    "marketplace": {
+      "devices": {
+        ".read": "auth != null",
+        "$deviceId": {
+          ".write": "auth != null && ((!data.exists() && newData.child('listedById').val() === auth.uid) || (data.exists() && data.child('listedById').val() === auth.uid))"
+        }
+      }
+    }
+  }
+}
